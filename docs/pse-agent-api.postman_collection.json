@@ -1,0 +1,168 @@
+{
+  "info": {
+    "name": "PSE Agent API - SIAP PPA (REQ/001/DISKOMINFO/2026)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Isi variabel koleksi `pse_token` dengan token Anda (jangan commit). Variabel lain: base_url, document_id, card_id, feature_id, base_version."
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{pse_token}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "base_url", "value": "https://lapusda.bandungkab.my.id/api/agent/v1" },
+    { "key": "pse_token", "value": "" },
+    { "key": "document_id", "value": "" },
+    { "key": "card_id", "value": "" },
+    { "key": "feature_id", "value": "" },
+    { "key": "base_version", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Baca",
+      "item": [
+        {
+          "name": "Konteks (markdown)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/context?format=markdown", "host": ["{{base_url}}"], "path": ["context"], "query": [{ "key": "format", "value": "markdown" }] }
+          }
+        },
+        {
+          "name": "Konteks (JSON)",
+          "request": { "method": "GET", "url": "{{base_url}}/context" }
+        },
+        {
+          "name": "Isi dokumen",
+          "request": { "method": "GET", "url": "{{base_url}}/documents/{{document_id}}" }
+        },
+        {
+          "name": "OpenAPI (tanpa auth)",
+          "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{base_url}}/openapi.json" }
+        }
+      ]
+    },
+    {
+      "name": "Dokumen",
+      "item": [
+        {
+          "name": "Dokumen baru (draf)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"tipe\": \"ERD\",\n  \"judul\": \"...\",\n  \"jenisIsi\": \"MERMAID\",\n  \"teks\": \"erDiagram\\n  A ||--o{ B : has\",\n  \"catatan\": \"...\",\n  \"commitSha\": \"\"\n}" },
+            "url": "{{base_url}}/documents"
+          }
+        },
+        {
+          "name": "Versi baru dokumen",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"baseVersion\": {{base_version}},\n  \"teks\": \"...\",\n  \"catatan\": \"...\"\n}" },
+            "url": "{{base_url}}/documents/{{document_id}}/versions"
+          }
+        },
+        {
+          "name": "Unggah PDF proposal (baru)",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "" },
+                { "key": "judul", "value": "Proposal pengembangan SIAP PPA", "type": "text" },
+                { "key": "catatan", "value": "", "type": "text" }
+              ]
+            },
+            "url": "{{base_url}}/documents/files"
+          }
+        },
+        {
+          "name": "Unggah PDF proposal (revisi)",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "" },
+                { "key": "judul", "value": "Proposal pengembangan SIAP PPA", "type": "text" },
+                { "key": "catatan", "value": "", "type": "text" },
+                { "key": "documentId", "value": "{{document_id}}", "type": "text" },
+                { "key": "baseVersion", "value": "{{base_version}}", "type": "text" }
+              ]
+            },
+            "url": "{{base_url}}/documents/files"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Kartu",
+      "item": [
+        {
+          "name": "Ubah / pindah kartu",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"kolom\": \"BERJALAN\",\n  \"catatan\": \"...\",\n  \"deskripsi\": \"...\"\n}" },
+            "url": "{{base_url}}/cards/{{card_id}}"
+          }
+        },
+        {
+          "name": "Lampirkan bukti",
+          "request": {
+            "method": "POST",
+            "body": { "mode": "formdata", "formdata": [{ "key": "file", "type": "file", "src": "" }] },
+            "url": "{{base_url}}/cards/{{card_id}}/attachments"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Kebutuhan & data",
+      "item": [
+        {
+          "name": "Ubah fitur",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"deskripsi\": \"...\",\n  \"kriteria\": [\"...\", \"...\"]\n}" },
+            "url": "{{base_url}}/requirements/features/{{feature_id}}"
+          }
+        },
+        {
+          "name": "Usulkan klasifikasi data",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"usulan\": [\n    {\n      \"namaData\": \"Harga komoditas\",\n      \"atributData\": \"nama, harga, pasar\",\n      \"kerahasiaan\": \"RENDAH\",\n      \"integritas\": \"TINGGI\",\n      \"ketersediaan\": \"SEDANG\",\n      \"alasan\": \"...\"\n    }\n  ]\n}" },
+            "url": "{{base_url}}/data-classification-proposals"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Repo & aktivitas",
+      "item": [
+        {
+          "name": "Set tautan repo/staging",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"repoUrl\": \"https://github.com/...\",\n  \"stagingUrl\": \"https://...\"\n}" },
+            "url": "{{base_url}}/links"
+          }
+        },
+        {
+          "name": "Laporkan aktivitas",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"jenis\": \"PUSH\",\n  \"cabang\": \"feat/K-12-tambah-data\",\n  \"commitSha\": \"\",\n  \"pesan\": \"K-12 tambah data\",\n  \"penulis\": \"\"\n}" },
+            "url": "{{base_url}}/activity"
+          }
+        }
+      ]
+    }
+  ]
+}

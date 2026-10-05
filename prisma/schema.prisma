@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PeranPengguna {
+  ADMIN
+  PENDAMPING
+}
+
+model Pengguna {
+  id            String        @id @default(uuid())
+  nama          String
+  email         String        @unique
+  kataSandiHash String
+  peran         PeranPengguna
+  kontak        String?
+  aktif         Boolean       @default(true)
+  dibuatPada    DateTime      @default(now())
+
+  @@map("pengguna")
+}

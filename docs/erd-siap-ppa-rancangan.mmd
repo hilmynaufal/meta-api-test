@@ -1,0 +1,60 @@
+%% RANCANGAN AWAL (bukan dari kode). Entitas bersifat usulan dari proposal bagian 5.1; perlu disepakati di tahap desain.
+erDiagram
+    PENGGUNA {
+        uuid id PK
+        string nama
+        string email UK
+        string kata_sandi_hash
+        string peran "ADMIN | PENDAMPING"
+        string kontak
+        boolean aktif
+    }
+    JENIS_KEKERASAN {
+        uuid id PK
+        string nama UK
+        boolean aktif
+    }
+    LAPORAN {
+        uuid id PK
+        string nomor_tiket UK
+        uuid jenis_kekerasan_id FK
+        string nama_pelapor
+        string kontak_pelapor
+        string identitas_korban
+        text kronologi
+        string status "BARU | TERVERIFIKASI | DITOLAK"
+        uuid diverifikasi_oleh FK
+        datetime dibuat_pada
+        datetime diverifikasi_pada
+    }
+    JADWAL_PENDAMPINGAN {
+        uuid id PK
+        uuid laporan_id FK
+        uuid pendamping_id FK
+        int nomor_antrean
+        datetime waktu_mulai
+        datetime waktu_selesai
+        uuid dibuat_oleh FK
+        datetime diubah_pada
+    }
+    KONTAK_DARURAT {
+        uuid id PK
+        string nama_instansi "UPTD PPA | Satgas"
+        string kecamatan
+        string nomor_kontak
+        boolean aktif
+    }
+    LOG_AUDIT {
+        uuid id PK
+        uuid pengguna_id FK
+        string aksi
+        string entitas
+        uuid entitas_id
+        datetime waktu
+    }
+
+    JENIS_KEKERASAN ||--o{ LAPORAN : "dikategorikan"
+    PENGGUNA ||--o{ LAPORAN : "memverifikasi"
+    LAPORAN ||--o| JADWAL_PENDAMPINGAN : "dijadwalkan"
+    PENGGUNA ||--o{ JADWAL_PENDAMPINGAN : "mendampingi / membuat"
+    PENGGUNA ||--o{ LOG_AUDIT : "mencatat"
